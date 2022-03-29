@@ -1,6 +1,7 @@
 import subprocess
 import optparse
 import random
+import re
 
 if __name__ == "__main__":
 
@@ -23,7 +24,7 @@ if __name__ == "__main__":
 
 			def Random_Mac():
 
-				random_string = "aAbBcCdDeEfF123456789" 
+				random_string = "abcdef123456789" 
 
 				rnd_list = []
 
@@ -47,9 +48,23 @@ if __name__ == "__main__":
 
 			subprocess.call("sudo ifconfig " + interface_input + " up", shell=True)
 
+			ifconfig_result = subprocess.check_output(["ifconfig", interface_input]).decode('utf-8')
 
+			print("\n" + '[+] Changing MAC address for ' + interface_input + ' to ' + "\033[92m" + MaChanger_X + "\033[0m" + "\n")
 
-			print('[+] Changing MAC address for ' + interface_input+ ' to ' + MaChanger_X)
+			print(ifconfig_result)
+
+			# Verification step
+
+			mac_address_interface = re.search(r"(\w\w:\w\w:\w\w:\w\w:\w\w:\w\w)", ifconfig_result)
+
+			verify_step_mac_address = mac_address_interface.group(0)
+
+			if verify_step_mac_address == MaChanger_X:
+				print("\033[92m" + "[+] MAC address changed with success!" + "\033[0m")
+			else:
+				print("\033[91m" + "[+] MAC address could not be changed!" + "\033[0m")
+
 
 		else:
 
@@ -61,9 +76,20 @@ if __name__ == "__main__":
 
 			subprocess.call("sudo ifconfig " + interface_input + " up", shell=True)
 
+			ifconfig_result = subprocess.check_output(["ifconfig", interface_input]).decode('utf-8')
 
+			print("\n" + '[+] Changing MAC address for ' + interface_input + ' to ' + "\033[92m" + options.manually_mac + "\033[0m" + "\n")
 
-			print('[+] Changing MAC address for ' + interface_input + ' to ' + options.manually_mac)
+			print(ifconfig_result)
+
+			mac_address_interface = re.search(r"(\w\w:\w\w:\w\w:\w\w:\w\w:\w\w)", ifconfig_result)
+
+			verify_step_mac_address = mac_address_interface.group(0)
+
+			if verify_step_mac_address == options.manually_mac:
+				print("\033[92m" + "[+] MAC address changed with success!" + "\033[0m")
+			else:
+				print("\033[91m" + "[+] MAC address could not be changed!" + "\033[0m")
 
 
 	except Exception as e: print(e)
